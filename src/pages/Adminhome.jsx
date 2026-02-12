@@ -1,7 +1,11 @@
 import { Typography, Container, Button, Box } from "@mui/material";
 import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminHome() {
+
+  const navigate = useNavigate();
+
   return (
     <>
       <Navbar />
@@ -12,7 +16,7 @@ export default function AdminHome() {
         </Typography>
 
         <Box mt={3}>
-          <Button variant="contained" fullWidth sx={{ mb: 2 }}>
+          <Button variant="contained" fullWidth sx={{ mb: 2 }} onClick={() => navigate("/updateMenu")}>
             Update Menu
           </Button>
 
@@ -20,7 +24,7 @@ export default function AdminHome() {
             View Orders
           </Button>
 
-          <Button variant="outlined" fullWidth>
+          <Button variant="contained" fullWidth>
             Manage Earnings
           </Button>
         </Box>

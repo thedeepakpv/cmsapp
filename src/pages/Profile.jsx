@@ -4,15 +4,18 @@ import {
   TextField,
   Button,
   Box,
-  Avatar
+  Avatar,
+  Alert
 } from "@mui/material";
 
 import Navbar from "../components/Navbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Collapse } from "@mui/material";
 
 export default function Profile() {
 
   const [editMode, setEditMode] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   const [user, setUser] = useState({
     name: "John Doe",
@@ -25,9 +28,20 @@ export default function Profile() {
   };
 
   const saveProfile = () => {
-    setEditMode(false);
-    alert("Profile Updated!");
+   setEditMode(false);
+   setShowAlert(true);                    
   };
+
+  useEffect(() => {
+  if (showAlert) {
+    const timer = setTimeout(() => {
+      setShowAlert(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }
+}, [showAlert]);
+
 
   return (
     <>
@@ -56,18 +70,10 @@ export default function Profile() {
         {!editMode ? (
 
           // ---------- VIEW MODE ----------
-          <Box mt={3}>
+          <Box mt={2}>
 
-            <Typography variant="body1" mb={2}>
-              <b>Name:</b> {user.name}
-            </Typography>
-
-            <Typography variant="body1" mb={2}>
-              <b>Email:</b> {user.email}
-            </Typography>
-
-            <Typography variant="body1" mb={2}>
-              <b>Phone:</b> {user.phone}
+            <Typography variant="h5" mb={2} textAlign="center" >
+              <b>{user.name}</b> 
             </Typography>
 
             <Button
@@ -75,7 +81,7 @@ export default function Profile() {
               fullWidth
               onClick={() => setEditMode(true)}
             >
-              Edit Profile
+              <b>Settings</b>
             </Button>
 
           </Box>
@@ -90,24 +96,6 @@ export default function Profile() {
               label="Name"
               name="name"
               value={user.name}
-              onChange={handleChange}
-              sx={{ mb: 2 }}
-            />
-
-            <TextField
-              fullWidth
-              label="Email"
-              name="email"
-              value={user.email}
-              onChange={handleChange}
-              sx={{ mb: 2 }}
-            />
-
-            <TextField
-              fullWidth
-              label="Phone"
-              name="phone"
-              value={user.phone}
               onChange={handleChange}
               sx={{ mb: 2 }}
             />
@@ -129,8 +117,20 @@ export default function Profile() {
               Cancel
             </Button>
 
+             <Typography variant="body1" mt={3} mb={2}>
+              <b>Contact Us: cmsapp@gmail.com</b> 
+            </Typography>
+
           </Box>
         )}
+           <Collapse in={showAlert}>
+              <Alert
+                severity="success"
+                sx={{ mt: 2 }}
+              >
+              Name changed successfully!
+             </Alert>
+           </Collapse>
       </Container>
     </>
   );
