@@ -1,43 +1,51 @@
-import { AppBar, Toolbar, Typography, IconButton } from "@mui/material";
+import { AppBar, Toolbar, Typography, IconButton, Box } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useNavigate } from "react-router-dom";
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 
 export default function Navbar({ isProfilePage }) {
-
   const navigate = useNavigate();
   const location = useLocation();
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: "#6a1b9a" }}>
-      <Toolbar>
-
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Canteen System
+    <AppBar
+      position="sticky"
+      elevation={0}
+      sx={{
+        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+        backdropFilter: 'blur(8px)',
+        borderBottom: '1px solid #e5e7eb',
+        color: 'text.primary',
+        width: { xs: 'calc(100% - 32px)', md: 'calc(100% - 64px)' },
+        margin: '16px auto',
+        borderRadius: 2,
+        top: 16,
+        zIndex: 1100
+      }}
+    >
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Typography variant="h6" fontWeight="bold">
+          Canteen
         </Typography>
-        
-        {location.pathname === "/user" && (
-        <IconButton color="inherit" onClick={() => navigate("/cart")}>
-          <ShoppingCartIcon />
-        </IconButton>
-       )}
 
-        {isProfilePage ? (
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          {location.pathname === "/user" && (
+            <IconButton disableRipple color="inherit" onClick={() => navigate("/cart")}>
+              <ShoppingCartOutlinedIcon />
+            </IconButton>
+          )}
 
-          <IconButton color="inherit" onClick={() => navigate(-1)}>
-            <ArrowBackIcon />
-          </IconButton>
-
-        ) : (
-
-          <IconButton color="inherit" onClick={() => navigate("/profile")}>
-            <AccountCircleIcon />
-          </IconButton>
-
-        )}
-
+          {isProfilePage ? (
+            <IconButton disableRipple color="inherit" onClick={() => navigate(-1)}>
+              <ArrowBackIcon />
+            </IconButton>
+          ) : (
+            <IconButton disableRipple color="inherit" onClick={() => navigate("/profile")}>
+              <AccountCircleIcon />
+            </IconButton>
+          )}
+        </Box>
       </Toolbar>
     </AppBar>
   );

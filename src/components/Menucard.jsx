@@ -1,57 +1,88 @@
 import { Card, CardContent, CardMedia, Typography, Button, Box } from "@mui/material";
 
 export default function MenuCard({ item, addToCart }) {
+  const isAvailable = Boolean(item.available);
+
   return (
     <Card
+      elevation={0}
       sx={{
-        width: 250,
-        margin: 2,
-        transition: "0.3s",
-        opacity: item.available ? 1 : 0.5,
-        backgroundColor: item.available ? "#e8f5e9" : "#fce4ec",
-        "&:hover": {
-          transform: item.available ? "scale(1.03)" : "none"
-        }
+        width: '100%',
+        minWidth: 250,
+        border: '1px solid #e5e7eb',
+        borderRadius: 3,
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        cursor: isAvailable ? 'pointer' : 'not-allowed',
+        opacity: isAvailable ? 1 : 0.6,
+        '&:hover': isAvailable ? {
+          borderColor: '#d1d5db',
+          transform: 'translateY(-4px)',
+          boxShadow: '0 12px 24px -10px rgba(0,0,0,0.05)',
+        } : {},
       }}
     >
-      {item.image && (
-        <CardMedia
-          component="img"
-          height="140"
-          image={item.image}
-          alt={item.name}
-        />
-      )}
+      <Box sx={{ position: 'relative' }}>
+        {item.image ? (
+          <CardMedia
+            component="img"
+            height="180"
+            image={item.image}
+            alt={item.name}
+            sx={{ filter: isAvailable ? 'none' : 'grayscale(100%)' }}
+          />
+        ) : (
+          <Box sx={{ height: 180, backgroundColor: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Typography variant="srOnly">No image available</Typography>
+          </Box>
+        )}
+        <Box sx={{
+          position: 'absolute', top: 12, right: 12,
+          display: 'flex', alignItems: 'center', gap: 1,
+          backgroundColor: 'rgba(255,255,255,0.9)',
+          backdropFilter: 'blur(4px)',
+          px: 1.5, py: 0.5, borderRadius: 5,
+          border: '1px solid rgba(0,0,0,0.05)'
+        }}>
+          <Box sx={{
+            width: 8, height: 8, borderRadius: '50%',
+            backgroundColor: isAvailable ? 'success.main' : 'text.disabled'
+          }} />
+          <Typography variant="caption" fontWeight="600" sx={{ color: 'text.primary' }}>
+            {isAvailable ? 'Available' : 'Sold Out'}
+          </Typography>
+        </Box>
+      </Box>
 
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
+      <CardContent sx={{ pt: 2, pb: '16px !important' }}>
+        <Typography variant="h6" sx={{ fontSize: '1.1rem', mb: 0.5, color: 'text.primary', fontWeight: 600 }}>
           {item.name}
         </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mt: 2 }}>
+          <Typography variant="subtitle1" fontWeight="700" sx={{ color: 'text.primary' }}>
+            ₹{item.price}
+          </Typography>
 
-        <Typography variant="body1" color="text.secondary">
-          Price: ₹{item.price}
-        </Typography>
-
-        <Typography
-          variant="body2"
-          sx={{
-            color: item.available ? "green" : "red",
-            fontWeight: "bold",
-            mt: 1
-          }}
-        >
-          {item.available ? "Available" : "Not Available"}
-        </Typography>
-
-        <Box mt={2}>
           <Button
-            variant="contained"
-            color="secondary"
-            fullWidth
-            disabled={!item.available}
+            size="small"
+            variant="outlined"
+            disableElevation
+            disabled={!isAvailable}
             onClick={() => addToCart(item)}
+            sx={{
+              borderColor: '#e5e7eb',
+              color: 'text.primary',
+              textTransform: 'none',
+              fontWeight: 500,
+              transition: 'all 0.2s',
+              '&:hover': {
+                backgroundColor: 'secondary.main',
+                color: '#fff',
+                borderColor: 'secondary.main',
+                transform: 'translateY(-1px)',
+              }
+            }}
           >
-            Add to cart
+            Add
           </Button>
         </Box>
       </CardContent>
