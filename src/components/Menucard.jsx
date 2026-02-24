@@ -1,6 +1,6 @@
 import { Card, CardContent, CardMedia, Typography, Button, Box } from "@mui/material";
 
-export default function MenuCard({ item, onOrder }) {
+export default function MenuCard({ item, addToCart }) {
   return (
     <Card
       sx={{
@@ -49,9 +49,9 @@ export default function MenuCard({ item, onOrder }) {
             color="secondary"
             fullWidth
             disabled={!item.available}
-            onClick={() => onOrder(item)}
+            onClick={() => addToCart(item)}
           >
-            Order Now
+            Add to cart
           </Button>
         </Box>
       </CardContent>
