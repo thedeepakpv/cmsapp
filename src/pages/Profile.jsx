@@ -28,38 +28,40 @@ export default function Profile() {
   };
 
   const saveProfile = () => {
-   setEditMode(false);
-   setShowAlert(true);                    
+    setEditMode(false);
+    setShowAlert(true);
   };
 
   useEffect(() => {
-  if (showAlert) {
-    const timer = setTimeout(() => {
-      setShowAlert(false);
-    }, 2000);
+    if (showAlert) {
+      const timer = setTimeout(() => {
+        setShowAlert(false);
+      }, 2000);
 
-    return () => clearTimeout(timer);
-  }
-}, [showAlert]);
+      return () => clearTimeout(timer);
+    }
+  }, [showAlert]);
 
 
   return (
     <>
       <Navbar isProfilePage={true} />
 
-      <Container maxWidth="sm">
-        <Box textAlign="center" mt={4}>
+      <Container maxWidth="sm" sx={{ px: { xs: 2, md: 4 }, py: { xs: 3, md: 6 } }}>
+        <Box textAlign="center" mt={4} mb={6}>
 
-          <Typography variant="h5">
+          <Typography variant="h4" fontWeight="900" letterSpacing="-0.03em" mb={3}>
             Profile
           </Typography>
 
           <Avatar
             sx={{
-              width: 80,
-              height: 80,
-              margin: "20px auto",
-              bgcolor: "#6a1b9a"
+              width: 96,
+              height: 96,
+              margin: "0 auto",
+              bgcolor: 'primary.main',
+              fontSize: '2.5rem',
+              fontWeight: 700
             }}
           >
             {user.name ? user.name.charAt(0).toUpperCase() : "U"}
@@ -70,18 +72,33 @@ export default function Profile() {
         {!editMode ? (
 
           // ---------- VIEW MODE ----------
-          <Box mt={2}>
+          <Box p={4} sx={{ border: '1px solid #e5e7eb', borderRadius: 3, backgroundColor: '#fff' }}>
 
-            <Typography variant="h5" mb={2} textAlign="center" >
-              <b>{user.name}</b> 
+            <Typography variant="h5" mb={1} textAlign="center" fontWeight="800">
+              {user.name}
+            </Typography>
+            <Typography variant="body1" color="text.secondary" textAlign="center" mb={4}>
+              {user.email} • {user.phone}
             </Typography>
 
             <Button
-              variant="contained"
+              variant="outlined"
               fullWidth
+              size="large"
               onClick={() => setEditMode(true)}
+              sx={{
+                py: 1.5,
+                borderColor: '#e5e7eb',
+                color: 'text.primary',
+                fontWeight: 600,
+                transition: 'all 0.2s',
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  backgroundColor: '#f9fafb'
+                }
+              }}
             >
-              <b>Settings</b>
+              Edit Settings
             </Button>
 
           </Box>
@@ -89,7 +106,7 @@ export default function Profile() {
         ) : (
 
           // ---------- EDIT MODE ----------
-          <Box mt={3}>
+          <Box p={4} sx={{ border: '1px solid #e5e7eb', borderRadius: 3, backgroundColor: '#fff' }}>
 
             <TextField
               fullWidth
@@ -97,40 +114,52 @@ export default function Profile() {
               name="name"
               value={user.name}
               onChange={handleChange}
-              sx={{ mb: 2 }}
+              sx={{ mb: 3 }}
             />
 
             <Button
               variant="contained"
+              disableElevation
               fullWidth
-              sx={{ mb: 2 }}
+              size="large"
+              sx={{
+                mb: 2, py: 1.5,
+                backgroundColor: 'primary.main',
+                transition: 'all 0.2s',
+                '&:hover': { backgroundColor: '#000', transform: 'translateY(-1px)' }
+              }}
               onClick={saveProfile}
             >
-              Save
+              Save Changes
             </Button>
 
             <Button
-              variant="outlined"
+              variant="text"
               fullWidth
+              size="large"
               onClick={() => setEditMode(false)}
+              sx={{ color: 'text.secondary', fontWeight: 600 }}
             >
               Cancel
             </Button>
 
-             <Typography variant="body1" mt={3} mb={2}>
-              <b>Contact Us: cmsapp@gmail.com</b> 
-            </Typography>
-
           </Box>
         )}
-           <Collapse in={showAlert}>
-              <Alert
-                severity="success"
-                sx={{ mt: 2 }}
-              >
-              Name changed successfully!
-             </Alert>
-           </Collapse>
+
+        <Box textAlign="center" mt={6}>
+          <Typography variant="body2" color="text.secondary">
+            Need help? Contact <Box component="span" fontWeight="700" color="text.primary">cmsapp@example.com</Box>
+          </Typography>
+        </Box>
+
+        <Collapse in={showAlert}>
+          <Alert
+            severity="success"
+            sx={{ mt: 3, borderRadius: 2, border: '1px solid #10b981', backgroundColor: '#ecfdf5', color: '#065f46' }}
+          >
+            Profile updated successfully
+          </Alert>
+        </Collapse>
       </Container>
     </>
   );
