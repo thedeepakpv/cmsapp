@@ -1,14 +1,41 @@
-import { Button, Typography, Container, Box } from "@mui/material";
+import { Button, Typography, Container, Box, TextField, Alert, CircularProgress } from "@mui/material";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
-
+import { useAuth } from "../context/AuthContext";
 
 export default function StartPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!username.trim() || !password.trim()) {
+      setError("Please enter both username and password.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const user = await login(username.trim(), password.trim());
+      if (user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/user");
+      }
+    } catch (err) {
+      setError(err.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-
-
     <Container maxWidth="sm" sx={{ px: { xs: 2, md: 4 }, py: { xs: 3, md: 6 }, display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '80vh' }}>
       <Box textAlign="center">
         <Typography variant="h3" fontWeight="900" letterSpacing="-0.04em" mb={1} color="text.primary">
@@ -19,10 +46,37 @@ export default function StartPage() {
         </Typography>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <TextField
+            label="Username"
+            variant="outlined"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+            fullWidth
+            sx={{ backgroundColor: '#fff', borderRadius: 2 }}
+          />
+          <TextField
+            label="Password"
+            type="password"
+            variant="outlined"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+            fullWidth
+            sx={{ backgroundColor: '#fff', borderRadius: 2 }}
+          />
+
+          {error && (
+            <Alert severity="error" sx={{ borderRadius: 2, textAlign: 'left' }}>
+              {error}
+            </Alert>
+          )}
+
           <Button
             variant="contained"
             disableElevation
             size="large"
+            disabled={loading}
             sx={{
               py: 2,
               backgroundColor: 'primary.main',
@@ -34,36 +88,12 @@ export default function StartPage() {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
               }
             }}
-            onClick={() => navigate("/user")}
+            onClick={handleLogin}
           >
-            Enter as User
-          </Button>
-
-          <Button
-            variant="outlined"
-            size="large"
-            sx={{
-              py: 2,
-              borderColor: '#e5e7eb',
-              color: 'text.primary',
-              borderRadius: 2,
-              borderWidth: 2,
-              transition: 'all 0.2s',
-              '&:hover': {
-                borderColor: 'secondary.main',
-                backgroundColor: 'secondary.main',
-                color: '#fff',
-                borderWidth: 2,
-                transform: 'translateY(-2px)',
-              }
-            }}
-            onClick={() => navigate("/admin")}
-          >
-            Enter as Admin
+            {loading ? <CircularProgress size={22} color="inherit" /> : "Sign In"}
           </Button>
         </Box>
       </Box>
     </Container>
-
   );
 }
