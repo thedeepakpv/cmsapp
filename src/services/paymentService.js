@@ -9,7 +9,7 @@ export const paymentService = {
                 gateway,
                 transaction_id: transactionId,
                 amount,
-                status: "completed",
+                status: "success",
                 paid_at: new Date().toISOString(),
             }])
             .select()
