@@ -39,6 +39,16 @@ export const orderService = {
         return data;
     },
 
+    async getOrdersByCustomer(customerName) {
+        const { data, error } = await supabase
+            .from("orders")
+            .select("*")
+            .eq("customer_name", customerName)
+            .order("created_at", { ascending: false });
+        if (error) throw error;
+        return data;
+    },
+
     async getOrderByOrderId(orderId) {
         const { data, error } = await supabase
             .from("orders")

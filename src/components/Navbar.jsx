@@ -2,11 +2,13 @@ import { AppBar, Toolbar, Typography, IconButton, Box, Badge } from "@mui/materi
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Navbar({ isProfilePage, cartCount = 0 }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const isUserPage = location.pathname === "/user";
 
   return (
     <AppBar
@@ -30,7 +32,8 @@ export default function Navbar({ isProfilePage, cartCount = 0 }) {
         </Typography>
 
         <Box sx={{ display: "flex", gap: 1 }}>
-          {location.pathname === "/user" && (
+          {/* Cart icon — only on menu page */}
+          {isUserPage && (
             <IconButton disableRipple color="inherit" onClick={() => navigate("/cart")}>
               <Badge
                 badgeContent={cartCount}
@@ -49,6 +52,19 @@ export default function Navbar({ isProfilePage, cartCount = 0 }) {
             </IconButton>
           )}
 
+          {/* My Orders icon — on menu and cart pages */}
+          {(isUserPage || location.pathname === "/cart") && (
+            <IconButton
+              disableRipple
+              color="inherit"
+              onClick={() => navigate("/orders")}
+              title="My Orders"
+            >
+              <ReceiptLongIcon />
+            </IconButton>
+          )}
+
+          {/* Back or Profile */}
           {isProfilePage ? (
             <IconButton disableRipple color="inherit" onClick={() => navigate(-1)}>
               <ArrowBackIcon />

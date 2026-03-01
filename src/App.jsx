@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import Updatemenu from "./pages/Updatemenu";
 import Cartpage from "./pages/Cartpage";
 import QRScanner from "./pages/QRScanner";
+import MyOrders from "./pages/MyOrders";
 import { useAuth } from "./context/AuthContext";
 
 function ProtectedRoute({ children, role }) {
@@ -65,6 +66,15 @@ function App() {
         element={
           <ProtectedRoute role="admin">
             <Updatemenu />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/orders"
+        element={
+          <ProtectedRoute role="user">
+            <MyOrders />
           </ProtectedRoute>
         }
       />
