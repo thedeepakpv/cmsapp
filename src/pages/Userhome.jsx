@@ -20,6 +20,9 @@ export default function UserHome({ cartItems, setCartItems }) {
 
   const addToCart = (item) => {
     const existing = cartItems.find((i) => i.id === item.id);
+    const currentQty = existing ? existing.quantity : 0;
+    // Block adding beyond available stock
+    if (item.stock != null && currentQty >= item.stock) return;
     if (existing) {
       setCartItems(cartItems.map((i) =>
         i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
@@ -98,7 +101,11 @@ export default function UserHome({ cartItems, setCartItems }) {
           <Grid container spacing={3}>
             {filtered.map((item) => (
               <Grid item xs={12} sm={6} md={4} key={item.id}>
-                <MenuCard item={item} addToCart={addToCart} />
+                <MenuCard
+                  item={item}
+                  addToCart={addToCart}
+                  cartQty={cartItems.find((c) => c.id === item.id)?.quantity ?? 0}
+                />
               </Grid>
             ))}
           </Grid>

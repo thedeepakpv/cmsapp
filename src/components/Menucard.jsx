@@ -1,7 +1,8 @@
 import { Card, CardContent, CardMedia, Typography, Button, Box } from "@mui/material";
 
-export default function MenuCard({ item, addToCart }) {
-  const isAvailable = Boolean(item.available);
+export default function MenuCard({ item, addToCart, cartQty = 0 }) {
+  const isAvailable = Boolean(item.available) && (item.stock == null || item.stock > 0);
+  const atMax = item.stock != null && cartQty >= item.stock;
 
   return (
     <Card
@@ -76,23 +77,23 @@ export default function MenuCard({ item, addToCart }) {
             size="small"
             variant="outlined"
             disableElevation
-            disabled={!isAvailable || (item.stock != null && item.stock <= 0)}
+            disabled={!isAvailable || atMax}
             onClick={() => addToCart(item)}
             sx={{
-              borderColor: '#e5e7eb',
-              color: 'text.primary',
+              borderColor: atMax ? '#e5e7eb' : '#e5e7eb',
+              color: atMax ? 'text.disabled' : 'text.primary',
               textTransform: 'none',
               fontWeight: 500,
               transition: 'all 0.2s',
-              '&:hover': {
+              '&:hover': !atMax ? {
                 backgroundColor: 'secondary.main',
                 color: '#fff',
                 borderColor: 'secondary.main',
                 transform: 'translateY(-1px)',
-              }
+              } : {},
             }}
           >
-            Add
+            {atMax ? 'Max' : 'Add'}
           </Button>
         </Box>
       </CardContent>
