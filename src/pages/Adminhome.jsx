@@ -1,5 +1,6 @@
 import { Typography, Container, Button, Box, CircularProgress, Alert, Chip, Divider } from "@mui/material";
 import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
+import BarChartIcon from "@mui/icons-material/BarChart";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -148,6 +149,7 @@ export default function AdminHome() {
             { label: "Update Menu", action: () => navigate("/updatemenu") },
             { label: "View Orders", action: () => setView("orders") },
             { label: "Scan QR / Verify Order", action: () => navigate("/scanner"), icon: <QrCodeScannerIcon sx={{ mr: 1 }} /> },
+            { label: "Analytics & Reports", action: () => navigate("/analytics"), icon: <BarChartIcon sx={{ mr: 1 }} /> },
           ].map(({ label, action, icon }) => (
             <Button
               key={label}

@@ -8,6 +8,7 @@ import Updatemenu from "./pages/Updatemenu";
 import Cartpage from "./pages/Cartpage";
 import QRScanner from "./pages/QRScanner";
 import MyOrders from "./pages/MyOrders";
+import Analytics from "./pages/Analytics";
 import { useAuth } from "./context/AuthContext";
 
 function ProtectedRoute({ children, role }) {
@@ -84,6 +85,15 @@ function App() {
         element={
           <ProtectedRoute role="admin">
             <QRScanner />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute role="admin">
+            <Analytics />
           </ProtectedRoute>
         }
       />
