@@ -35,13 +35,36 @@ export function AuthProvider({ children }) {
     return data;
   };
 
+  const signup = async (username, password) => {
+    // Check if username is already taken
+    const { data: existing } = await supabase
+      .from("users")
+      .select("id")
+      .eq("username", username)
+      .maybeSingle();
+
+    if (existing) throw new Error("Username already taken. Please choose another.");
+
+    const { data, error } = await supabase
+      .from("users")
+      .insert([{ username, password, role: "user" }])
+      .select()
+      .single();
+
+    if (error || !data) throw new Error("Sign up failed. Please try again.");
+
+    setCurrentUser(data);
+    localStorage.setItem("cms_user", JSON.stringify(data));
+    return data;
+  };
+
   const logout = () => {
     setCurrentUser(null);
     localStorage.removeItem("cms_user");
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout, loading }}>
+    <AuthContext.Provider value={{ currentUser, login, signup, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
