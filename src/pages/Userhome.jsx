@@ -1,5 +1,5 @@
 import { Typography, Grid, Container, CircularProgress, Box, Alert, Chip } from "@mui/material";
-import MenuCard from "../components/MenuCard";
+import MenuCard from "../components/Menucard";
 import Navbar from "../components/Navbar";
 import { useEffect, useState, useMemo } from "react";
 import { menuService } from "../services/menuService";
