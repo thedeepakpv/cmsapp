@@ -27,10 +27,16 @@ export default function Cartpage({ cartItems, setCartItems }) {
         .filter((item) => item.quantity > 0)
     );
 
-  const increaseQuantity = (id) =>
+  const increaseQuantity = (id) => {
     setCartItems(
-      cartItems.map((item) => (item.id === id ? { ...item, quantity: item.quantity + 1 } : item))
+      cartItems.map((item) => {
+        if (item.id !== id) return item;
+        // Enforce stock ceiling
+        if (item.stock != null && item.quantity >= item.stock) return item;
+        return { ...item, quantity: item.quantity + 1 };
+      })
     );
+  };
 
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const cartCount = cartItems.reduce((sum, i) => sum + i.quantity, 0);
@@ -175,7 +181,9 @@ export default function Cartpage({ cartItems, setCartItems }) {
                     <Typography fontWeight="bold" color="text.primary">-</Typography>
                   </IconButton>
                   <Typography fontWeight="600" width={20} textAlign="center">{item.quantity}</Typography>
-                  <IconButton size="small" onClick={() => increaseQuantity(item.id)} disableRipple>
+                  <IconButton size="small" onClick={() => increaseQuantity(item.id)} disableRipple
+                    disabled={item.stock != null && item.quantity >= item.stock}
+                  >
                     <Typography fontWeight="bold" color="text.primary">+</Typography>
                   </IconButton>
                 </Box>

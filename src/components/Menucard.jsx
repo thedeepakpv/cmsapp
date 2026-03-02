@@ -57,6 +57,16 @@ export default function MenuCard({ item, addToCart }) {
         <Typography variant="h6" sx={{ fontSize: '1.1rem', mb: 0.5, color: 'text.primary', fontWeight: 600 }}>
           {item.name}
         </Typography>
+
+        {/* Stock count for users */}
+        <Typography variant="caption" sx={{ color: isAvailable ? 'text.secondary' : '#ef4444', fontWeight: 500 }}>
+          {isAvailable
+            ? item.stock != null
+              ? `${item.stock} left in stock`
+              : 'In Stock'
+            : 'Out of Stock'}
+        </Typography>
+
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mt: 2 }}>
           <Typography variant="subtitle1" fontWeight="700" sx={{ color: 'text.primary' }}>
             ₹{item.price}
@@ -66,7 +76,7 @@ export default function MenuCard({ item, addToCart }) {
             size="small"
             variant="outlined"
             disableElevation
-            disabled={!isAvailable}
+            disabled={!isAvailable || (item.stock != null && item.stock <= 0)}
             onClick={() => addToCart(item)}
             sx={{
               borderColor: '#e5e7eb',

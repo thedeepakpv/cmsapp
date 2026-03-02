@@ -25,12 +25,16 @@ export default function Updatemenu() {
   const [newPrice, setNewPrice] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newImage, setNewImage] = useState("");
+  const [newStock, setNewStock] = useState("");
 
   // Confirmation dialog
   const [confDialog, setConfDialog] = useState(false);
 
   // Pending local price changes: { [id]: newPrice }
   const [priceEdits, setPriceEdits] = useState({});
+
+  // Pending local stock changes: { [id]: newStock }
+  const [stockEdits, setStockEdits] = useState({});
 
   // Items marked for delete
   const [toDelete, setToDelete] = useState(new Set());
@@ -48,6 +52,11 @@ export default function Updatemenu() {
     setPriceEdits((prev) => ({ ...prev, [id]: value }));
   };
 
+  const updateStockLocally = (id, value) => {
+    if (!/^\d*$/.test(value)) return;
+    setStockEdits((prev) => ({ ...prev, [id]: value }));
+  };
+
   const toggleDelete = (id) => {
     setToDelete((prev) => {
       const next = new Set(prev);
@@ -58,6 +67,7 @@ export default function Updatemenu() {
 
   const handleAddConfirm = async () => {
     const price = Number(newPrice);
+    const stock = Number(newStock) || 0;
     if (!newName.trim()) return;
 
     setSaving(true);
@@ -67,14 +77,15 @@ export default function Updatemenu() {
         price,
         category: newCategory.trim() || "General",
         image: newImage.trim(),
-        stock: 0,
-        available: price > 0,
+        stock,
+        available: stock > 0,
       });
       setItems((prev) => [...prev, created]);
       setNewName("");
       setNewPrice("");
       setNewCategory("");
       setNewImage("");
+      setNewStock("");
       setOpenDialog(false);
     } catch {
       setErrorMsg("Failed to add item.");
@@ -89,10 +100,23 @@ export default function Updatemenu() {
     setConfDialog(false);
 
     try {
-      // Apply price edits
-      for (const [id, price] of Object.entries(priceEdits)) {
-        const p = Number(price);
-        await menuService.updateItem(id, { price: p, available: p > 0 });
+      // Items that have either a price or stock edit
+      const allEditedIds = new Set([
+        ...Object.keys(priceEdits),
+        ...Object.keys(stockEdits),
+      ]);
+
+      for (const id of allEditedIds) {
+        const updates = {};
+        if (priceEdits[id] !== undefined) {
+          updates.price = Number(priceEdits[id]);
+        }
+        if (stockEdits[id] !== undefined) {
+          const s = Number(stockEdits[id]);
+          updates.stock = s;
+          updates.available = s > 0;
+        }
+        await menuService.updateItem(id, updates);
       }
 
       // Delete marked items
@@ -104,6 +128,7 @@ export default function Updatemenu() {
       const fresh = await menuService.getAll();
       setItems(fresh);
       setPriceEdits({});
+      setStockEdits({});
       setToDelete(new Set());
       setIsDeleting(false);
       setShowAlert(true);
@@ -117,6 +142,9 @@ export default function Updatemenu() {
 
   const displayPrice = (item) =>
     priceEdits[item.id] !== undefined ? priceEdits[item.id] : String(item.price);
+
+  const displayStock = (item) =>
+    stockEdits[item.id] !== undefined ? stockEdits[item.id] : String(item.stock ?? 0);
 
   return (
     <>
@@ -158,16 +186,49 @@ export default function Updatemenu() {
                   <Typography fontWeight="600" color="text.primary">{item.name}</Typography>
                   <Typography variant="caption" color="text.secondary">{item.category}</Typography>
 
-                  <Box display="flex" alignItems="center" mt={1}>
-                    <Typography variant="body2" color="text.secondary" mr={1} fontWeight="500">₹</Typography>
-                    <TextField
-                      size="small"
-                      variant="standard"
-                      value={displayPrice(item)}
-                      onChange={(e) => updatePriceLocally(item.id, e.target.value)}
-                      InputProps={{ disableUnderline: true }}
-                      sx={{ backgroundColor: '#f3f4f6', borderRadius: 1, px: 1, width: 80, '& input': { py: 0.5, fontWeight: '500' } }}
-                    />
+                  <Box display="flex" alignItems="center" gap={2} mt={1} flexWrap="wrap">
+                    {/* Price */}
+                    <Box display="flex" alignItems="center">
+                      <Typography variant="body2" color="text.secondary" mr={0.5} fontWeight="500">₹</Typography>
+                      <TextField
+                        size="small"
+                        variant="standard"
+                        value={displayPrice(item)}
+                        onChange={(e) => updatePriceLocally(item.id, e.target.value)}
+                        InputProps={{ disableUnderline: true }}
+                        inputProps={{ inputMode: 'numeric' }}
+                        sx={{ backgroundColor: '#f3f4f6', borderRadius: 1, px: 1, width: 72, '& input': { py: 0.5, fontWeight: '500' } }}
+                      />
+                    </Box>
+
+                    {/* Stock */}
+                    <Box display="flex" alignItems="center">
+                      <Typography variant="body2" color="text.secondary" mr={0.5} fontWeight="500">Qty</Typography>
+                      <TextField
+                        size="small"
+                        variant="standard"
+                        value={displayStock(item)}
+                        onChange={(e) => updateStockLocally(item.id, e.target.value)}
+                        InputProps={{ disableUnderline: true }}
+                        inputProps={{ inputMode: 'numeric' }}
+                        sx={{ backgroundColor: '#f3f4f6', borderRadius: 1, px: 1, width: 60, '& input': { py: 0.5, fontWeight: '500' } }}
+                      />
+                    </Box>
+
+                    {/* Live stock status badge */}
+                    <Box sx={{
+                      display: 'inline-flex', alignItems: 'center', gap: 0.5,
+                      px: 1, py: 0.3, borderRadius: 5,
+                      backgroundColor: Number(displayStock(item)) > 0 ? '#ecfdf5' : '#fef2f2',
+                    }}>
+                      <Box sx={{
+                        width: 6, height: 6, borderRadius: '50%',
+                        backgroundColor: Number(displayStock(item)) > 0 ? '#10b981' : '#ef4444',
+                      }} />
+                      <Typography variant="caption" fontWeight="600" sx={{ color: Number(displayStock(item)) > 0 ? '#065f46' : '#991b1b' }}>
+                        {Number(displayStock(item)) > 0 ? 'In Stock' : 'Out of Stock'}
+                      </Typography>
+                    </Box>
                   </Box>
                 </Box>
 
@@ -241,6 +302,7 @@ export default function Updatemenu() {
             <TextField label="Item Name" fullWidth variant="outlined" value={newName} onChange={(e) => setNewName(e.target.value)} sx={{ mt: 1, mb: 3 }} />
             <TextField label="Category" fullWidth variant="outlined" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} sx={{ mb: 3 }} />
             <TextField label="Price (₹)" type="number" fullWidth variant="outlined" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} sx={{ mb: 3 }} />
+            <TextField label="Initial Stock (qty)" type="number" fullWidth variant="outlined" value={newStock} onChange={(e) => setNewStock(e.target.value)} sx={{ mb: 3 }} />
             <TextField label="Image URL (optional)" fullWidth variant="outlined" value={newImage} onChange={(e) => setNewImage(e.target.value)} placeholder="https://example.com/image.jpg" />
           </DialogContent>
           <DialogActions sx={{ pb: 2, px: 3 }}>
