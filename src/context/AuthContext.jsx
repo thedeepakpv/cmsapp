@@ -10,13 +10,16 @@ export function AuthProvider({ children }) {
   // Restore session from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem("cms_user");
+    let parsed = null;
     if (stored) {
       try {
-        setCurrentUser(JSON.parse(stored));
+        parsed = JSON.parse(stored);
       } catch {
         localStorage.removeItem("cms_user");
       }
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentUser(parsed);
     setLoading(false);
   }, []);
 
@@ -70,4 +73,5 @@ export function AuthProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

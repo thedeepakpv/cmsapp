@@ -1,7 +1,7 @@
 import { Container, Typography, Box, Button, Alert, CircularProgress } from "@mui/material";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { orderService } from "../services/orderService";
 import { Html5Qrcode } from "html5-qrcode";
 
@@ -12,28 +12,7 @@ export default function QRScanner() {
     const [result, setResult] = useState(null);   // { success, order, error }
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const html5Qrcode = new Html5Qrcode("qr-reader");
-        scannerRef.current = html5Qrcode;
-
-        // Start scanning
-        html5Qrcode.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            onScanSuccess,
-            () => { } // ignore per-frame errors
-        )
-            .then(() => setScanning(true))
-            .catch((err) => {
-                setResult({ success: false, error: "Camera access denied. Please allow camera permission." });
-            });
-
-        return () => {
-            html5Qrcode.isScanning && html5Qrcode.stop().catch(() => { });
-        };
-    }, []);
-
-    const onScanSuccess = async (decodedText) => {
+    const onScanSuccess = useCallback(async (decodedText) => {
         if (loading || result) return; // prevent duplicate scan handling
 
         // Stop scanner immediately to avoid repeat triggers
@@ -59,7 +38,28 @@ export default function QRScanner() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [loading, result]);
+
+    useEffect(() => {
+        const html5Qrcode = new Html5Qrcode("qr-reader");
+        scannerRef.current = html5Qrcode;
+
+        // Start scanning
+        html5Qrcode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            onScanSuccess,
+            () => { } // ignore per-frame errors
+        )
+            .then(() => setScanning(true))
+            .catch(() => {
+                setResult({ success: false, error: "Camera access denied. Please allow camera permission." });
+            });
+
+        return () => {
+            html5Qrcode.isScanning && html5Qrcode.stop().catch(() => { });
+        };
+    }, [onScanSuccess]);
 
     const reset = () => {
         setResult(null);
